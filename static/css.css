@@ -1,0 +1,40 @@
+@font-face {
+  font-family: font0;
+  src: url("ChaletLondonNineteenSixty.ttf");
+}
+
+@font-face {
+  font-family: font1;
+  src: url("SignPainterHouseScriptRegular.ttf");
+}
+
+body {
+  overflow: hidden; /* Hide scrollbars */
+  margin: 0px;
+  padding: 0px;
+}
+
+h1 {
+  margin: 0px;
+  font-family: font1;
+  font-style: italic;
+  font-weight: 200;
+}
+
+h2 {
+  margin: 0px;
+  font-family: font0;
+  font-weight: 100;
+}
+
+h3 {
+  margin: 0px;
+  font-family: font0;
+  font-weight: 100;
+}
+
+h4 {
+  margin: 0px;
+  font-family: font0;
+  font-weight: 100;
+}
