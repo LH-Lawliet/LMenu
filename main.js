@@ -13,9 +13,6 @@ let basicMenuStyle = {
     },
     sliderStyle: { r1: 4, g1: 32, b1: 57, a1: 1.0, r2: 56, g2: 116, b2: 200, a2: 1.0, textColor: "rgb(10,10,10)" },
     navBar: { display: true, margin : 2 /*in %*/, r1: 5, g1: 5, b1: 5, a1: 0.75, r2: 5, g2: 5, b2: 5, a2: 0.73},
-    sound: {
-
-    },
     maxElement: 10
 }
 
@@ -402,11 +399,6 @@ function renderButton() {
             "margin-right": "auto",
         }); 
     }
-}
-
-function playAudio(src) {
-    $('#menu-sound').attr("src", src);
-    $('#menu-sound').trigger('play')
 }
 
 
