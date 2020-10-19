@@ -1,7 +1,5 @@
 let currentMenu = null
 
-console.log('script loaded')
-
 let basicMenuStyle = {
     margin: 2, //(in %)
     width: 25, //(in %)
@@ -15,14 +13,18 @@ let basicMenuStyle = {
     },
     sliderStyle: { r1: 4, g1: 32, b1: 57, a1: 1.0, r2: 56, g2: 116, b2: 200, a2: 1.0, textColor: "rgb(10,10,10)" },
     navBar: { display: true, margin : 2 /*in %*/, r1: 5, g1: 5, b1: 5, a1: 0.75, r2: 5, g2: 5, b2: 5, a2: 0.73},
+    sound: {
 
+    },
     maxElement: 10
 }
 
 
 
 function renderMenu(menuData) {
+    console.log(menuData.style)
     let menuStyle = Object.assign({}, menuData.style, basicMenuStyle);
+    console.log(menuStyle)
     let root = document.getElementById("root")
 
     $("#root").css({
@@ -358,12 +360,10 @@ function renderButton() {
                     $("#description").css({
                         "display": "block",
                     });
-                    console.log("show desctiption")
                 } else {
                     $("#description").css({
                         "display": "none",
                     });
-                    console.log("hide desctiption")
                 }
             }
         }    
@@ -401,6 +401,10 @@ function renderButton() {
     }
 }
 
+function playAudio(src) {
+    $('#menu-sound').attr("src", src);
+    $('#menu-sound').trigger('play')
+}
 
 
 document.addEventListener('keydown', keyPressed);
@@ -414,6 +418,7 @@ function keyPressed(e) {
             if (currentMenu.selectedButton < 0) {
                 currentMenu.selectedButton = currentMenu.buttons.length - 1
             }
+            
         } else if (e.key == "ArrowDown") {
             currentMenu.lastInput = currentTs
 
@@ -507,7 +512,7 @@ function keyPressed(e) {
 }
 
 function closeMenu() {
-    fetch(`https://${GetParentResourceName()}/menu:deleteMenu`, { "method": "POST", "body": "{}" });
+    fetch(`https://${GetParentResourceName()}/menu:deletedMenu`, { "method": "POST", "body": JSON.stringify(currentMenu) });
 
     currentMenu = null
     $("#root").css({
@@ -527,10 +532,10 @@ $(document).ready(function () {
         }
         if (event.data.menuData) {
             if (currentMenu) {
-                currentMenu = null
-                $('#root').empty();
+                closeMenu()
             }
             renderMenu(event.data.menuData)
+            fetch(`https://${GetParentResourceName()}/menu:openedMenu`, { "method": "POST", "body": JSON.stringify(currentMenu) });
         }
     });
 });

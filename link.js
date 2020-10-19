@@ -1,12 +1,21 @@
 let registeredCallback = []
 let registeredOnIndexChange = []
 
+let menus = {}
+let currentlyOpened = null
+
+function randomString(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
 
 function createMenu(menuData) {
-    SetNuiFocus(true, false)
-    SetNuiFocusKeepInput(true)
-
-
     for (i in menuData.buttons){
         let btn = menuData.buttons[i]
         if (btn.callback) {
@@ -43,19 +52,50 @@ function createMenu(menuData) {
         }
     }
 
+    if (!menuData.id) {
+        menuData.id = randomString(20)
+    } 
+    menus[menuData.id] = menuData
+
+    return menuData
+};
+
+
+RegisterNuiCallbackType('menu:deletedMenu')
+on('__cfx_nui:menu:deletedMenu', (data, cb) => {
+    SetNuiFocus(false, false)
+    console.log("Closing "+data.id)
+    menus[data.id] = data
+    menus[data.id].opened = false
+});
+
+
+RegisterNuiCallbackType('menu:openedMenu')
+on('__cfx_nui:menu:openedMenu', (data, cb) => {
+    SetNuiFocus(true, false)
+    SetNuiFocusKeepInput(true)
+    console.log("Opened " + data.id)
+    menus[data.id] = data
+    menus[data.id].opened = true
+    currentlyOpened = data.id
+});
+
+function openMenu(menuId) {
     SendNuiMessage(JSON.stringify({
-        menuData: menuData
+        menuData: menus[menuId]
+    }))
+}
+
+function closeMenu() {
+    SendNuiMessage(JSON.stringify({
+        action: "close"
     }))
 };
 
 
-RegisterNuiCallbackType('menu:deleteMenu')
-on('__cfx_nui:menu:deleteMenu', (data, cb) => {
-    SetNuiFocus(false, false)
-});
-
-function deleteMenu() {
-    SendNuiMessage(JSON.stringify({
-        action: "close"
-    }))
+function deleteMenu(id) {
+    if (menus[id].opened) {
+        closeMenu()
+    }
+    delete menus[id]
 };

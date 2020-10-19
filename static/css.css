@@ -38,3 +38,7 @@ h4 {
   font-family: font0;
   font-weight: 100;
 }
+
+#menu-sound {
+  display: none;
+}
