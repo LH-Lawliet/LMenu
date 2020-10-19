@@ -4,6 +4,9 @@ let registeredOnIndexChange = []
 let menus = {}
 let currentlyOpened = null
 
+
+// -------------------------------------------- required function for lib usage --------------------------------------- //
+
 function randomString(length) {
     var result = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -14,6 +17,8 @@ function randomString(length) {
     return result;
 }
 
+
+// -------------------------------------------- Lib function --------------------------------------- //
 
 function createMenu(menuData) {
     for (i in menuData.buttons){
@@ -61,24 +66,6 @@ function createMenu(menuData) {
 };
 
 
-RegisterNuiCallbackType('menu:deletedMenu')
-on('__cfx_nui:menu:deletedMenu', (data, cb) => {
-    SetNuiFocus(false, false)
-    console.log("Closing "+data.id)
-    menus[data.id] = data
-    menus[data.id].opened = false
-});
-
-
-RegisterNuiCallbackType('menu:openedMenu')
-on('__cfx_nui:menu:openedMenu', (data, cb) => {
-    SetNuiFocus(true, false)
-    SetNuiFocusKeepInput(true)
-    console.log("Opened " + data.id)
-    menus[data.id] = data
-    menus[data.id].opened = true
-    currentlyOpened = data.id
-});
 
 function openMenu(menuId) {
     SendNuiMessage(JSON.stringify({
@@ -99,3 +86,33 @@ function deleteMenu(id) {
     }
     delete menus[id]
 };
+
+
+function getCurrentMenuData() { // warning this function will return the old state of the menu (state of the menu only synced on close)
+    if (!currentlyOpened) {
+        return null
+    }
+    return menus[currentlyOpened]
+};
+
+
+// --------------------------------------------  STATIC CALLBACK --------------------------------------- //
+
+RegisterNuiCallbackType('menu:deletedMenu')
+on('__cfx_nui:menu:deletedMenu', (data, cb) => {
+    SetNuiFocus(false, false)
+    console.log("Closing "+data.id)
+    menus[data.id] = data
+    menus[data.id].opened = false
+});
+
+
+RegisterNuiCallbackType('menu:openedMenu')
+on('__cfx_nui:menu:openedMenu', (data, cb) => {
+    SetNuiFocus(true, false)
+    SetNuiFocusKeepInput(true)
+    console.log("Opened " + data.id)
+    menus[data.id] = data
+    menus[data.id].opened = true
+    currentlyOpened = data.id
+});

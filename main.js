@@ -22,9 +22,7 @@ let basicMenuStyle = {
 
 
 function renderMenu(menuData) {
-    console.log(menuData.style)
-    let menuStyle = Object.assign({}, menuData.style, basicMenuStyle);
-    console.log(menuStyle)
+    let menuStyle = Object.assign({}, basicMenuStyle, menuData.style);
     let root = document.getElementById("root")
 
     $("#root").css({
@@ -66,11 +64,13 @@ function renderMenu(menuData) {
         title.append(menuData.title);
         banner.appendChild(title);
 
+        
+        let deltaHeight = window.screen.width * (menuStyle.margin / 100)
         $("#title").css({
             'position': 'absolute',
-            'top': menuStyle.margin+1+"%",
+            'top': deltaHeight +"px",
             'width': width + "px",
-            'line-height': height+ "px",
+            'line-height': height + "px",
             'text-align': 'center',
             'color': menuStyle.banner.titleColor,
             'font-size': height/1.5 + "px",
@@ -108,37 +108,40 @@ function renderMenu(menuData) {
         });
     }
 
+    let width = window.screen.width * (menuStyle.width / 100)
 
-    let top = menuStyle.buttonHeight * currentMenu.buttons.length
-    if (currentMenu.buttons.length > menuStyle.maxElement) {
-        top = menuStyle.buttonHeight * menuStyle.maxElement
-    }
-    top += menuStyle.buttonHeight*2
-    top += menuStyle.margin
+    let top = window.screen.width * (menuStyle.margin / 100)
+
     if (menuStyle.banner && menuStyle.banner.a) {
-        let height = menuStyle.width / menuStyle.banner.ratio
-        top += height
+        top += width / menuStyle.banner.ratio
     }
     if (menuStyle.subtitle) {
-        top += menuStyle.width / menuStyle.subtitle.ratio
+        top += width / menuStyle.subtitle.ratio
     }
+    let buttonBackgroundSize = menuStyle.buttonHeight * currentMenu.buttons.length
+    if (currentMenu.buttons.length > menuStyle.maxElement) {
+        buttonBackgroundSize = menuStyle.buttonHeight * menuStyle.maxElement
+    }
+    top += window.screen.height * (buttonBackgroundSize / 100)
+
     if (menuStyle.navBar.display) {
-        top += menuStyle.buttonHeight
+        top += window.screen.height * (menuStyle.buttonHeight / 100)
     }
 
-
+    top += 2 //to have a little margin
+    
     var descriptionArea = document.createElement("div");
     descriptionArea.setAttribute("id", "description");
 
     root.appendChild(descriptionArea);
 
-    let width = window.screen.width * (menuStyle.width / 100)
+    width = window.screen.width * (menuStyle.width / 100)
 
     let color = menuStyle.backgroundColor
     $("#description").css({
         "display": "none",
         "position": "absolute",
-        "top": top+ "%",
+        "top": top+ "px",
         "width": width + "px",
         "background-image": "linear-gradient(180deg, rgba(" + color.r1 + "," + color.g1 + "," + color.b1 + "," + color.a1 + "), rgba(" + color.r2 + "," + color.g2 + "," + color.b2 + "," + color.a2 + "))",
     });
