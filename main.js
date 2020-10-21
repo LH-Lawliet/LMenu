@@ -237,6 +237,17 @@ function renderButton() {
                 "background-image": "linear-gradient(90deg, rgba(" + buttonColor.r1 + "," + buttonColor.g1 + "," + buttonColor.b1 + "," + buttonColor.a1 + "), rgba(" + buttonColor.r2 + "," + buttonColor.g2 + "," + buttonColor.b2 + "," + buttonColor.a2 + "))",
             });
 
+            $("#button" + i).click(function () {
+                console.log("click")
+                buttonExec(button)
+            })
+            $("#button" + i).hover(function () {
+                if (currentMenu.selectedButton != i) {
+                    currentMenu.selectedButton = i
+                    renderButton()
+                }
+            })       
+
 
             var buttonTextElement = document.createElement("h3");
             buttonTextElement.setAttribute("id", "buttonText" + i);
@@ -299,6 +310,7 @@ function renderButton() {
                     'font-size': height / 2 + "px",
                     'text-align': 'right'
                 });
+
             } else if (button.type == "slider") {
                 var buttonRightElement = document.createElement("div");
                 buttonRightElement.setAttribute("id", "slider" + i);
@@ -401,6 +413,16 @@ function renderButton() {
     }
 }
 
+$(window).on('wheel', function (e) {
+    if (currentMenu.mouse) {
+        let delta = e.originalEvent.deltaY
+        if (delta < 0) {
+            
+        } else {
+            
+        }
+    }
+});
 
 document.addEventListener('keydown', keyPressed);
 
@@ -409,33 +431,13 @@ function keyPressed(e) {
         let currentTs = new Date().getTime()
         if (e.key == "ArrowUp") {
             currentMenu.lastInput = currentTs
-            currentMenu.selectedButton = currentMenu.selectedButton - 1
-            if (currentMenu.selectedButton < 0) {
-                currentMenu.selectedButton = currentMenu.buttons.length - 1
-            }
-            
+            goUp()
         } else if (e.key == "ArrowDown") {
             currentMenu.lastInput = currentTs
-
-            currentMenu.selectedButton = currentMenu.selectedButton + 1
-            if (currentMenu.selectedButton > currentMenu.buttons.length - 1) {
-                currentMenu.selectedButton = 0
-            }
-
+            goDown()
         } else if (e.key == "Enter") {
-            let button = currentMenu.buttons[currentMenu.selectedButton]
             currentMenu.lastInput = currentTs
-
-            if (button.type == "checkBox") {
-                button.checked = !button.checked
-            }
-            if (button.callbackEvent) {
-                fetch(`https://${GetParentResourceName()}/callback:${button.callbackEvent}`, { "method": "POST", "body": JSON.stringify(button)});
-            }
-            if (button.close) {
-                closeMenu()
-            } 
-            
+            buttonExec(currentMenu.buttons[currentMenu.selectedButton])
         } else if (e.key == "ArrowRight") {
             let button = currentMenu.buttons[currentMenu.selectedButton]
             if (button.type == "list" ) {
@@ -454,6 +456,7 @@ function keyPressed(e) {
                         fetch(`https://${GetParentResourceName()}/onIndexChange:${button.onIndexChangeEvent}`, { "method": "POST", "body": JSON.stringify(button) });
                     }
                 }
+                renderButton()
             } else if (button.type == "slider") {
                 currentMenu.lastInput = currentTs
                 let value = currentMenu.buttons[currentMenu.selectedButton].sliderValue
@@ -467,6 +470,7 @@ function keyPressed(e) {
                 if (button.onIndexChangeEvent) {
                     fetch(`https://${GetParentResourceName()}/onIndexChange:${button.onIndexChangeEvent}`, { "method": "POST", "body": JSON.stringify(button) });
                 }
+                renderButton()
             }
         } else if (e.key == "ArrowLeft") {
             let button = currentMenu.buttons[currentMenu.selectedButton]
@@ -487,6 +491,7 @@ function keyPressed(e) {
                 if (button.onIndexChangeEvent) {
                     fetch(`https://${GetParentResourceName()}/onIndexChange:${button.onIndexChangeEvent}`, { "method": "POST", "body": JSON.stringify(button) });
                 }
+                renderButton()
             } else if (button.type == "slider") {
                 currentMenu.lastInput = currentTs
                 let value = currentMenu.buttons[currentMenu.selectedButton].sliderValue
@@ -500,10 +505,40 @@ function keyPressed(e) {
                 if (button.onIndexChangeEvent) {
                     fetch(`https://${GetParentResourceName()}/onIndexChange:${button.onIndexChangeEvent}`, { "method": "POST", "body": JSON.stringify(button) });
                 }
+                renderButton()
             }
         }
+    }
+}
+
+
+function buttonExec(button) {
+    if (button.type == "checkBox") {
+        button.checked = !button.checked
         renderButton()
     }
+    if (button.callbackEvent) {
+        fetch(`https://${GetParentResourceName()}/callback:${button.callbackEvent}`, { "method": "POST", "body": JSON.stringify(button) });
+    }
+    if (button.close) {
+        closeMenu()
+    }
+}
+
+function goUp() {
+    currentMenu.selectedButton = currentMenu.selectedButton - 1
+    if (currentMenu.selectedButton < 0) {
+        currentMenu.selectedButton = currentMenu.buttons.length - 1
+    }
+    renderButton()
+}
+
+function goDown() {
+    currentMenu.selectedButton = currentMenu.selectedButton + 1
+    if (currentMenu.selectedButton > currentMenu.buttons.length - 1) {
+        currentMenu.selectedButton = 0
+    }
+    renderButton()
 }
 
 function closeMenu() {

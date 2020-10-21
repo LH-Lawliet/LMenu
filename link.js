@@ -106,11 +106,11 @@ on('__cfx_nui:menu:deletedMenu', (data, cb) => {
     menus[data.id].opened = false
 });
 
-
+SetNuiFocus(false, false)
 RegisterNuiCallbackType('menu:openedMenu')
 on('__cfx_nui:menu:openedMenu', (data, cb) => {
-    SetNuiFocus(true, false)
-    SetNuiFocusKeepInput(true)
+    SetNuiFocus(true, data.mouse)
+    SetNuiFocusKeepInput(!data.mouse)
     console.log("Opened " + data.id)
     menus[data.id] = data
     menus[data.id].opened = true
