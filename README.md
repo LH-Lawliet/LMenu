@@ -45,6 +45,7 @@ function Notification(message) {
 }
 
 function indexChanged(Val, Index) {
+    console.log(Val, Index)
     Notification("Index changed to " + Val + " " + Index)
 }
 
@@ -65,13 +66,25 @@ function onMoveSlider(value, data) {
     Notification("Slider is now at : " + value)
 }
 
+colors = []
+for (let i = 0; i < 25; i++) {
+    let color = []
+    for (let n = 0; n < 3; n++) {
+        color.push(Math.floor(Math.random() * 255))
+    }
+    colors.push(color)
+}
+console.log(colors)
+
 let menu = {
     title: "Native UI",
     subtitle: "Test",
+    style: {margin: 4},
+    //mouse: true,
     buttons: [
         { text: "Liste", callback: Notification, onIndexChange: indexChanged, description:"My name is Christ Cosmique", type: "list", listData: ["Jésus", "Claude", "Franklin", "Mamadou", 25, "Elene"]},
         { text: "1 Oui", rightText: "200$", callback: JeSuisDieu, callbackData: ["oui"] },
-        { text: "2 Non", callback: JeSuisDieu, callbackData: ["Non"] },
+        { text: "2 Colors", type: "colors", colors: colors, onIndexChange: indexChanged },
         { text: "3 Josef", rightText: "200$", callback: JeSuisDieu, callbackData: ["Josef"] },
         { text: "4 Youri", rightText: "", callback: JeSuisDieu, callbackData: ["Youri"] },
         { text: "5 Oui", rightText: "👍", callback: JeSuisDieu, callbackData: ["oui", "Alfred", { test: "NANANA" }] },
@@ -86,11 +99,15 @@ let menu = {
     ]
 }
 
-
+let created = false
 
 setTick(() => {
     if (IsControlJustPressed(0, 82 /*;*/)) {
-        createMenu(menu)
+        if (!created) {
+            menu = createMenu(menu)
+            created = true
+        }
+        openMenu(menu.id)
     }
 });
 ```
