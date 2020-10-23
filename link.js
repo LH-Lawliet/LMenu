@@ -48,6 +48,8 @@ function createMenu(menuData) {
                 on('__cfx_nui:onIndexChange:' + btn.onIndexChange.name, (data, cb) => {
                     if (btn.type == "list") {
                         btn.onIndexChange(data.selectedInList, data.listIndex, data.callbackData)
+                    } else if (btn.type == "colors") {
+                        btn.onIndexChange(data.color, data.colorIndex, data.callbackData)
                     } else if (btn.type == "slider"){
                         btn.onIndexChange(data.sliderValue, data.callbackData)
                     }

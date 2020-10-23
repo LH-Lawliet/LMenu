@@ -237,17 +237,19 @@ function renderButton() {
                 "background-image": "linear-gradient(90deg, rgba(" + buttonColor.r1 + "," + buttonColor.g1 + "," + buttonColor.b1 + "," + buttonColor.a1 + "), rgba(" + buttonColor.r2 + "," + buttonColor.g2 + "," + buttonColor.b2 + "," + buttonColor.a2 + "))",
             });
 
-            $("#button" + i).click(function () {
-                console.log("click")
-                buttonExec(button)
-            })
-            $("#button" + i).hover(function () {
-                if (currentMenu.selectedButton != i) {
-                    currentMenu.selectedButton = i
-                    renderButton()
-                }
-            })       
+            if (currentMenu.mouse) {
+                $("#button" + i).click(function () {
+                    buttonExec(button)
+                })
+                $("#button" + i).hover(function () {
+                    if (currentMenu.selectedButton != i) {
+                        currentMenu.selectedButton = i
+                        renderButton()
+                    }
+                })       
 
+            }
+            
 
             var buttonTextElement = document.createElement("h3");
             buttonTextElement.setAttribute("id", "buttonText" + i);
@@ -289,6 +291,98 @@ function renderButton() {
                     'font-size': height/1.5 + "px",
                     'text-align': 'right'
                 });
+            } else if (button.type == "colors") {
+                button.colorIndex = button.colorIndex || 0
+                button.color = button.colors[button.colorIndex]
+
+                var buttonRightTextElement = document.createElement("h3");
+                buttonRightTextElement.setAttribute("id", "buttonRightText" + i);
+                
+
+                buttonElement.appendChild(buttonRightTextElement);
+
+                buttonRightTextElement.append(button.colorIndex+1 + "/" + button.colors.length)
+                $("#buttonRightText" + i).css({
+                    "position": "relative",
+                    "display": "block",
+                    "top": "0 px",
+                    "height": height + "px",
+                    "color": buttonColor.textColor,
+                    'line-height': height + "px",
+                    'font-size': height / 2 + "px",
+                    'text-align': 'right',
+                });
+
+                var buttonColorDiv = document.createElement("div");
+                buttonColorDiv.setAttribute("id", "buttonColorDiv" + i);
+
+                buttonElement.appendChild(buttonColorDiv);
+                $("#buttonColorDiv" + i).css({
+                    "position": "relative",
+                    "display": "block",
+                    "width": width * 0.25 + "px",
+                    "top": "0 px",
+                    "height": height + "px",
+                    "margin-left": "1.5%",
+                    "padding-top": (height - (height / 1.2)) / 2 + "px",
+                });
+
+                let leftColor = (0,0,0,0)
+                if (button.colorIndex!=0) {
+                    leftColor = [button.colors[button.colorIndex - 1][0], button.colors[button.colorIndex - 1][1], button.colors[button.colorIndex - 1][2], 0.8]
+                }
+
+                var buttonColorDivLeft = document.createElement("div");
+                buttonColorDiv.appendChild(buttonColorDivLeft);
+                buttonColorDivLeft.setAttribute("id", "buttonColorDivLeft" + i);
+                $("#buttonColorDivLeft" + i).css({
+                    "position": "relative",
+                    "display": "inline-block",
+                    "width": height/2 + "px",
+                    "height": height/2 + "px",
+                    'background-color': 'blue',
+                    "margin-left": "5%",
+                    "background-color": 'rgba(' + leftColor[0] + ',' + leftColor[1] + ',' + leftColor[2] + ',' + leftColor[3]+')',
+                    "margin-bottom": (height - (height / 2)) / 2 + "px",
+                });
+
+                var buttonColorDivSelected = document.createElement("div");
+                buttonColorDiv.appendChild(buttonColorDivSelected);
+                buttonColorDivSelected.setAttribute("id", "buttonColorDivSelected" + i);
+                $("#buttonColorDivSelected" + i).css({
+                    "position": "relative",
+                    "display": "inline-block",
+                    "width": height / 1.2 + "px",
+                    "height": height / 1.2 + "px",
+                    "background-color": 'rgba(' + button.color[0] + ',' + button.color[1] + ',' + button.color[2]+', 0.8)',
+                    "margin-left": "5%",
+                    "margin-bottom": (height - (height / 1.2)) / 2 + "px",
+                });
+
+
+                let rightColor = (0, 0, 0, 0)
+                console.log(button.colors.length)
+                if (button.colorIndex != button.colors.length-1) {
+                    rightColor = [button.colors[button.colorIndex + 1][0], button.colors[button.colorIndex + 1][1], button.colors[button.colorIndex + 1][2], 0.8]
+                }
+                console.log(rightColor)
+
+                var buttonColorDivRight = document.createElement("div");
+                buttonColorDiv.appendChild(buttonColorDivRight);
+                buttonColorDivRight.setAttribute("id", "buttonColorDivRight" + i);
+                $("#buttonColorDivRight" + i).css({
+                    "position": "relative",
+                    "display": "inline-block",
+                    "width": height / 2 + "px",
+                    "height": height / 2 + "px",
+                    'background-color': 'yellow',
+                    "margin-left": "5%",
+                    "background-color": 'rgba(' + rightColor[0] + ',' + rightColor[1] + ',' + rightColor[2] + ',' + rightColor[3] + ')',
+                    "margin-bottom": (height - (height / 2)) / 2 + "px",
+                });
+                
+
+
             } else if (button.type == "list") {
                 var buttonRightTextElement = document.createElement("h3");
                 buttonRightTextElement.setAttribute("id", "buttonRightText" + i);
@@ -457,6 +551,22 @@ function keyPressed(e) {
                     }
                 }
                 renderButton()
+            } else if (button.type == 'colors') {
+                currentMenu.lastInput = currentTs
+                if (button.colors) {
+                    let posInList = button.colorIndex
+                    let list = button.colors
+                    posInList = posInList + 1
+                    if (posInList > list.length - 1) {
+                        posInList = 0
+                    }
+                    button.colorIndex = posInList
+                    button.color = button.colors[posInList]
+                    if (button.onIndexChangeEvent) {
+                        fetch(`https://${GetParentResourceName()}/onIndexChange:${button.onIndexChangeEvent}`, { "method": "POST", "body": JSON.stringify(button) });
+                    }
+                }
+                renderButton()
             } else if (button.type == "slider") {
                 currentMenu.lastInput = currentTs
                 let value = currentMenu.buttons[currentMenu.selectedButton].sliderValue
@@ -490,6 +600,23 @@ function keyPressed(e) {
 
                 if (button.onIndexChangeEvent) {
                     fetch(`https://${GetParentResourceName()}/onIndexChange:${button.onIndexChangeEvent}`, { "method": "POST", "body": JSON.stringify(button) });
+                }
+                renderButton()
+            } else if (button.type == 'colors') {
+                currentMenu.lastInput = currentTs
+                if (button.colors) {
+                    let posInList = button.colorIndex
+                    let list = button.colors
+                    posInList = posInList - 1
+                    if (posInList < 0) {
+                        posInList = list.length - 1
+                    }
+                    button.colorIndex = posInList
+                    button.color = button.colors[posInList]
+
+                    if (button.onIndexChangeEvent) {
+                        fetch(`https://${GetParentResourceName()}/onIndexChange:${button.onIndexChangeEvent}`, { "method": "POST", "body": JSON.stringify(button) });
+                    }
                 }
                 renderButton()
             } else if (button.type == "slider") {
